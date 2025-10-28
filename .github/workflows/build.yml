@@ -3,22 +3,22 @@ name: Build Android APK
 on:
   push:
     branches: [ main, master ]
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # ← Use Ubuntu 22.04 instead of latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
-    - name: Install Buildozer dependencies
+    - name: Install system dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y \
@@ -33,22 +33,24 @@ jobs:
           zlib1g-dev \
           libncurses5-dev \
           libncursesw5-dev \
-          libtinfo5 \
           cmake \
           libffi-dev \
-          libssl-dev
+          libssl-dev \
+          libtinfo5  # ← This will work on Ubuntu 22.04
 
     - name: Install Buildozer
       run: pip install buildozer
 
-    - name: Build APK with Buildozer
+    - name: Build Android APK
       run: |
         buildozer init
+        buildozer android clean
         buildozer -v android debug
 
     - name: Upload APK
+      if: success()
       uses: actions/upload-artifact@v4
       with:
-        name: stockctrl-scanner-apk
+        name: StockCtrl-APK
         path: bin/*.apk
-        retention-days: 30
+        retention-days: 7
