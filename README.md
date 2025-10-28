@@ -1,0 +1,1 @@
+for inventory counting
