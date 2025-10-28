@@ -1,0 +1,101 @@
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.screenmanager import ScreenManager, Screen
+import requests
+import json
+from datetime import datetime
+
+print("=== StockCtrl Scanner - Android Version ===")
+
+class WelcomeScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = BoxLayout(orientation='vertical', padding=40, spacing=20)
+        
+        title = Label(
+            text='📱 StockCtrl Scanner',
+            font_size='24sp',
+            size_hint=(1, 0.3)
+        )
+        layout.add_widget(title)
+        
+        subtitle = Label(
+            text='Mobile Inventory Counting',
+            font_size='16sp',
+            size_hint=(1, 0.2)
+        )
+        layout.add_widget(subtitle)
+        
+        self.branch_input = TextInput(
+            hint_text='Enter Branch Code (1550/1551)',
+            size_hint=(1, 0.2),
+            multiline=False,
+            font_size='18sp'
+        )
+        layout.add_widget(self.branch_input)
+        
+        continue_btn = Button(
+            text='➡️ Continue',
+            size_hint=(1, 0.2),
+            background_color=(0.2, 0.6, 0.8, 1)
+        )
+        continue_btn.bind(on_press=self.check_branch)
+        layout.add_widget(continue_btn)
+        
+        self.add_widget(layout)
+    
+    def check_branch(self, instance):
+        branch = self.branch_input.text.strip()
+        if branch in ['1550', '1551']:
+            self.manager.current = 'main_menu'
+        else:
+            # Show error - you can add a popup here
+            print("Invalid branch code")
+
+class MainMenuScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = BoxLayout(orientation='vertical', padding=40, spacing=15)
+        
+        buttons = [
+            ('🧮 START COUNTING', self.start_counting),
+            ('📤 SUBMIT COUNT', self.submit_count),
+            ('🔄 SYNC DATA', self.sync_data),
+            ('📊 VIEW COUNTS', self.view_counts)
+        ]
+        
+        for text, callback in buttons:
+            btn = Button(
+                text=text,
+                size_hint=(1, 0.2),
+                background_color=(0.3, 0.5, 0.8, 1)
+            )
+            btn.bind(on_press=callback)
+            layout.add_widget(btn)
+        
+        self.add_widget(layout)
+    
+    def start_counting(self, instance):
+        print("Starting counting...")
+        # Add your counting logic here
+    
+    def submit_count(self, instance):
+        print("Submitting count...")
+    
+    def sync_data(self, instance):
+        print("Syncing data...")
+    
+    def view_counts(self, instance):
+        print("Viewing counts...")
+
+class StockCtrlApp(App):
+    def build(self):
+        sm = ScreenManager()
+        sm.add_widget(WelcomeScreen(name='welcome'))
+        sm.add_widget(MainMenuScreen(name='main_menu'))
+        return sm
+
+if __name__ == '__main__':
+    StockCtrlApp().run()
